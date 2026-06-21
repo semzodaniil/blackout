@@ -1,0 +1,32 @@
+name: Compile BlackOut
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          sudo mv bin/arduino-cli /usr/local/bin/
+
+      - name: Install ESP32 core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install m5stack:esp32
+
+      - name: Compile firmware
+        run: |
+          arduino-cli compile --fqbn m5stack:esp32:m5stick-c-plus BlackOut.ino
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlackOut-firmware
+          path: build/m5stack.esp32.m5stick-c-plus/BlackOut.ino.bin
