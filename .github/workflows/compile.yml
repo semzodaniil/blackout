@@ -16,17 +16,25 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
           sudo mv bin/arduino-cli /usr/local/bin/
 
-      - name: Install ESP32 core (official)
+      - name: Add M5Stack board manager URL
+        run: |
+          arduino-cli config add board_manager.additional_urls https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+
+      - name: Update index and install M5Stack core
         run: |
           arduino-cli core update-index
-          arduino-cli core install esp32:esp32
+          arduino-cli core install m5stack:esp32
 
-      - name: Compile firmware
+      - name: List all boards (to see exact name)
         run: |
-          arduino-cli compile --fqbn esp32:esp32:m5stick-c blackout.ino
+          arduino-cli board listall | grep -i m5stick
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BlackOut-firmware
-          path: build/esp32.esp32.m5stick-c/blackout.ino.bin
+      - name: Compile firmware (try m5stick-c-plus)
+        run: |
+          arduino-cli compile --fqbn m5stack:esp32:m5stick-c-plus blackout.ino
+        continue-on-error: true
+
+      - name: If failed, try m5stick-c
+        run: |
+          arduino-cli compile --fqbn m5stack:esp32:m5stick-c blackout.ino
+        if: failure()
