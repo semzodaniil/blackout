@@ -25,6 +25,10 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install m5stack:esp32
 
+      - name: Install M5StickCPlus library
+        run: |
+          arduino-cli lib install "M5StickCPlus"
+
       - name: Compile firmware for M5StickC Plus2
         run: |
           arduino-cli compile --fqbn m5stack:esp32:m5stack_stickc_plus2 blackout.ino
