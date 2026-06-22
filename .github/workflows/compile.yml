@@ -27,7 +27,7 @@ jobs:
 
       - name: Compile firmware
         run: |
-          arduino-cli compile --fqbn m5stack:esp32:m5stick-c-plus BlackOut.ino
+          arduino-cli compile --fqbn m5stack:esp32:m5stick-c-plus blackout.ino
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
