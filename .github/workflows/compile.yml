@@ -33,10 +33,21 @@ jobs:
         run: |
           arduino-cli compile --fqbn m5stack:esp32:m5stack_stickc_plus2 blackout.ino
 
-      - name: Find and upload .bin file
+      - name: Find and copy .bin file from anywhere
         run: |
-          find build -name "*.bin" -exec echo "Found: {}" \;
-          find build -name "*.bin" -exec cp {} firmware.bin \;
+          # Вывести все файлы в дереве проекта для отладки
+          echo "=== Список всех файлов ==="
+          find . -type f
+          echo "==========================="
+          # Ищем любой .bin
+          BIN_FILE=$(find . -name "*.bin" -type f | head -n 1)
+          if [ -z "$BIN_FILE" ]; then
+            echo "Ошибка: .bin файл не найден!"
+            exit 1
+          fi
+          echo "Найден .bin: $BIN_FILE"
+          cp "$BIN_FILE" firmware.bin
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
