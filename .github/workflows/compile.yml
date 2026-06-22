@@ -25,16 +25,22 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install m5stack:esp32
 
-      - name: List all boards (to see exact name)
+      - name: List all available boards (full output)
         run: |
-          arduino-cli board listall | grep -i m5stick
+          arduino-cli board listall --format text
 
-      - name: Compile firmware (try m5stick-c-plus)
+      - name: Compile firmware (auto-detect board name)
         run: |
-          arduino-cli compile --fqbn m5stack:esp32:m5stick-c-plus blackout.ino
-        continue-on-error: true
+          # Ищем точное имя платы, содержащее "m5stick" или "stick"
+          BOARD=$(arduino-cli board listall --format text | grep -i "m5stick" | head -1 | awk '{print $1}' | cut -d':' -f2)
+          if [ -z "$BOARD" ]; then
+            BOARD="m5stick-c"  # fallback
+          fi
+          echo "Using board: $BOARD"
+          arduino-cli compile --fqbn m5stack:esp32:$BOARD blackout.ino
 
-      - name: If failed, try m5stick-c
-        run: |
-          arduino-cli compile --fqbn m5stack:esp32:m5stick-c blackout.ino
-        if: failure()
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlackOut-firmware
+          path: build/m5stack.esp32.*/blackout.ino.bin
