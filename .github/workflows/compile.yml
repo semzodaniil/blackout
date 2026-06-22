@@ -25,6 +25,12 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install m5stack:esp32
 
-      - name: List all available boards (full output)
+      - name: Compile firmware for M5StickC Plus2
         run: |
-          arduino-cli board listall --format text | grep -i m5stick
+          arduino-cli compile --fqbn m5stack:esp32:m5stack_stickc_plus2 blackout.ino
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlackOut-firmware
+          path: build/m5stack.esp32.m5stack_stickc_plus2/blackout.ino.bin
