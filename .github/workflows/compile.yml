@@ -33,8 +33,12 @@ jobs:
         run: |
           arduino-cli compile --fqbn m5stack:esp32:m5stack_stickc_plus2 blackout.ino
 
+      - name: Find and upload .bin file
+        run: |
+          find build -name "*.bin" -exec echo "Found: {}" \;
+          find build -name "*.bin" -exec cp {} firmware.bin \;
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: BlackOut-firmware
-          path: build/m5stack.esp32.m5stack_stickc_plus2/blackout.ino.bin
+          path: firmware.bin
