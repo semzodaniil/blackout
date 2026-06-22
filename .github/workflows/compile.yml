@@ -33,13 +33,11 @@ jobs:
         run: |
           arduino-cli compile --fqbn m5stack:esp32:m5stack_stickc_plus2 blackout.ino
 
-      - name: Find and copy .bin file from anywhere
+      - name: Find and copy .bin file
         run: |
-          # Вывести все файлы в дереве проекта для отладки
-          echo "=== Список всех файлов ==="
-          find . -type f
-          echo "==========================="
-          # Ищем любой .bin
+          echo "=== Поиск всех .bin файлов ==="
+          find . -name "*.bin" -type f
+          echo "==============================="
           BIN_FILE=$(find . -name "*.bin" -type f | head -n 1)
           if [ -z "$BIN_FILE" ]; then
             echo "Ошибка: .bin файл не найден!"
