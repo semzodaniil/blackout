@@ -16,7 +16,11 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
           sudo mv bin/arduino-cli /usr/local/bin/
 
-      - name: Install ESP32 core
+      - name: Add M5Stack board manager URL
+        run: |
+          arduino-cli config add board_manager.additional_urls https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+
+      - name: Update index and install ESP32 core
         run: |
           arduino-cli core update-index
           arduino-cli core install m5stack:esp32
